@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+<title>Inventario</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#121212;
+color:white;
+padding:15px;
+}
+
+h1{
+text-align:center;
+margin-bottom:15px;
+}
+
+input, textarea{
+text-transform: uppercase;
+width:100%;
+padding:10px;
+margin-bottom:10px;
+border-radius:8px;
+border:1px solid #444;
+background:#1e1e1e;
+color:white;
+}
+
+button{
+padding:10px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+font-weight:bold;
+}
+
+.guardar{
+width:100%;
+background:#2196F3;
+color:white;
+}
+
+.cancelar{
+margin-top:10px;
+width:100%;
+background:#9259c7;
+color:white;
+}
+
+.historial{ 
+background:#2196F3;
+color:white;
+}
+
+.producto{
+background:#1e1e1e;
+padding:15px;
+border-radius:12px;
+margin-top:10px;
+border:1px solid #333;
+}
+
+.producto h3{
+color:#4FC3F7;
+margin-bottom:8px;
+}
+
+.botones{
+display:flex;
+flex-wrap:wrap;
+gap:5px;
+margin-top:10px;
+}
+
+.entrada{
+background:#4CAF50;
+color:white;
+}
+
+.salida{
+background:#757575;
+color:white;
+}
+
+.editar{
+background:#FF9800;
+color:white;
+}
+
+.borrar{
+background:#F44336;
+color:white;
+}
+
+#btnFlotante{
+
+position:fixed;
+bottom:20px;
+right:20px;
+
+width:60px;
+height:60px;
+
+border-radius:50%;
+
+font-size:32px;
+
+background:#2196F3;
+color:white;
+
+box-shadow:0 4px 10px rgba(0,0,0,.3);
+
+z-index:1000;
+
+}
+
+#formularioProducto{
+display:none;
+}
+
+#estadisticas{
+    display:flex;
+    gap:15px;
+    margin-bottom:15px;
+    flex-wrap:wrap;
+}
+
+#estadisticas div{
+    background:#1e1e1e;
+    border:1px solid #333;
+    border-radius:10px;
+    padding:12px;
+    font-size:18px;
+    font-weight:bold;
+}
+
+</style>
+</head>
+<body>
+
+<h1>📦 Inventario</h1>
+
+<div id="estadisticas">
+    <div id="totalProductos"></div>
+    <div id="totalExistencias"></div>
+    <div id="ultimaExportacion">
+🕒 Última exportación: NUNCA
+</div>
+
+</div>
+
+<button
+id="btnExportar"
+onclick="exportarExcel()"
+style="
+width:100%;
+margin-bottom:15px;
+background:#4CAF50;
+color:white;
+padding:12px;
+border:none;
+border-radius:8px;
+font-weight:bold;
+cursor:pointer;
+">
+📥 EXPORTAR EXCEL
+</button>
+
+<input id="buscar" placeholder="Buscar producto">
+
+<div id="formularioProducto">
+
+    <input id="codigo" placeholder="Código de barras">
+
+    <input id="nombre" placeholder="Nombre">
+
+    <textarea id="descripcion" placeholder="Descripción"></textarea>
+
+    <input id="cantidad" type="number" placeholder="Cantidad">
+
+    <input id="area" placeholder="Área">
+
+    <button class="guardar" onclick="guardarProducto()">
+    💾 Guardar Producto
+    </button>
+
+    <button
+    style="
+    width:100%;
+    margin-top:10px;
+    background:#d32f2f;
+    color:white;
+    "
+    onclick="reiniciarInventario()">
+    🗑 Reiniciar Inventario
+    </button>
+
+    <button class="cancelar" onclick="cerrarFormulario()">
+      🔙 Cancelar
+    </button>
+
+
+</div>
+
+<div id="lista"></div>
+
+<script>
+
+let productos = [];
+let editando = null;
+
+const datosGuardados =
+localStorage.getItem("inventario_trabajo");
+
+if(datosGuardados){
+    productos = JSON.parse(datosGuardados);
+}
+
+const ultimaExportacion =
+localStorage.getItem(
+"ultima_exportacion"
+);
+
+document
+.getElementById(
+"ultimaExportacion"
+)
+.innerHTML =
+"🕒 Última exportación: " +
+(
+ultimaExportacion ||
+"NUNCA"
+);
+function guardarLocal() {
+    localStorage.setItem(
+        "inventario_trabajo",
+        JSON.stringify(productos)
+    );
+}
+
+function fechaActual(){
+return new Date().toLocaleString();
+}
+
+function guardarProducto(){
+
+//CAMBIAR ESTO:
+// const codigo = document.getElementById("codigo").value;
+// const nombre = document.getElementById("nombre").value;
+// const descripcion = document.getElementById("descripcion").value;
+const cantidad = Number(document.getElementById("cantidad").value) || 0;
+// const area = document.getElementById("area").value;
+
+//POR ESTO:
+const codigo =
+document.getElementById("codigo")
+.value
+.trim()
+.toUpperCase();
+
+const nombre =
+document.getElementById("nombre")
+.value
+.trim()
+.toUpperCase();
+
+const descripcion =
+document.getElementById("descripcion")
+.value
+.trim()
+.toUpperCase();
+
+const area =
+document.getElementById("area")
+.value
+.trim()
+.toUpperCase();
+
+if(nombre.trim() === ""){
+alert("Ingresa un nombre");
+return;
+}
+
+if(editando === null){
+
+    const existente = productos.find(
+        p => p.codigo === codigo
+    );
+
+    if(existente){
+
+        let extra = prompt(
+            "PRODUCTO EXISTENTE\n\n" +
+            "Existencias actuales: " +
+            existente.cantidad +
+            "\n\n" +
+            "¿Cuántas unidades deseas agregar?"
+        );
+
+        if(extra === null) return;
+
+        extra = Number(extra);
+
+        if(isNaN(extra) || extra <= 0){
+            alert("Cantidad inválida");
+            return;
+        }
+
+        existente.cantidad += extra;
+
+        existente.modificado = fechaActual();
+
+        if(!existente.historial){
+            existente.historial = [];
+        }
+
+        existente.historial.push({
+            fecha: fechaActual(),
+            tipo: "ENTRADA",
+            cantidad: extra
+        });
+
+        guardarLocal();
+        mostrarProductos();
+        limpiar();
+
+        return;
+    }
+};
+
+if(editando !== null){
+
+productos[editando] = {
+...productos[editando],
+codigo,
+nombre,
+descripcion,
+cantidad,
+area,
+modificado: fechaActual()
+};
+
+editando = null;
+
+}else{
+
+productos.push({
+codigo,
+nombre,
+descripcion,
+cantidad,
+area,
+modificado: fechaActual(),
+
+historial:[
+{
+    fecha:fechaActual(),
+    tipo:"CREACION",
+    cantidad:cantidad,
+    stockAnterior:0,
+    stockNuevo:cantidad
+}
+]
+
+});
+
+}
+
+guardarLocal();
+limpiar();
+mostrarProductos();
+}
+
+function mostrarProductos(){
+
+productos.sort((a,b)=>
+a.nombre.localeCompare(b.nombre)
+);
+
+const filtro =
+document.getElementById("buscar")
+.value
+.toLowerCase();
+
+const lista =
+document.getElementById("lista");
+
+lista.innerHTML = "";
+
+productos
+.filter(p =>
+p.nombre.toLowerCase().includes(filtro) ||
+p.codigo.toLowerCase().includes(filtro)
+)
+.forEach((p,index)=>{
+
+const div = document.createElement("div");
+
+div.className = "producto";
+
+div.innerHTML = `
+<h3>${p.nombre}</h3>
+
+<p><b>Código:</b> ${p.codigo}</p>
+
+<p style="
+color:#4CAF50;
+font-weight:bold;
+font-size:1.2rem;">
+Cantidad: ${p.cantidad}
+</p>
+
+<div
+id="info-${index}"
+style="display:none;">
+
+<p><b>Descripción:</b> ${p.descripcion}</p>
+
+<p><b>Área:</b> ${p.area}</p>
+
+<p><b>Modificado:</b> ${p.modificado}</p>
+
+
+<div class="botones">
+
+<button class="entrada"
+onclick="entrada(${index})">
++ Entrada
+</button>
+
+<button class="salida"
+onclick="salida(${index})">
+- Salida
+</button>
+
+<button class="editar"
+onclick="editar(${index})">
+Editar
+</button>
+
+<button class="borrar"
+onclick="eliminarProducto(${index})">
+Eliminar
+</button>
+
+<button class="historial"
+onclick="verHistorial(${index})">
+📜 Historial
+</button>
+
+
+</div>
+
+</div>
+
+<button
+onclick="toggleInfo(${index})"
+style="
+width:100%;
+margin-top:10px;
+margin-bottom:10px;
+background:#333;
+color:white;">
+ℹ MÁS INFORMACIÓN
+</button>
+
+`;
+
+lista.appendChild(div);
+
+});
+actualizarEstadisticas();
+}
+
+function toggleInfo(index){
+
+    const info =
+    document.getElementById(
+        "info-" + index
+    );
+
+    if(info.style.display === "none"){
+
+        info.style.display = "block";
+
+    }else{
+
+        info.style.display = "none";
+
+    }
+
+}
+
+function entrada(index){
+
+let cantidad =
+prompt("¿Cuántas unidades deseas agregar?");
+
+if(cantidad === null) return;
+
+cantidad = Number(cantidad);
+
+if(isNaN(cantidad) || cantidad <= 0){
+    alert("Cantidad inválida");
+    return;
+}
+
+let stockAnterior =
+productos[index].cantidad;
+
+productos[index].cantidad += cantidad;
+
+alert(
+"Cantidad actual: " +
+productos[index].cantidad
+);
+
+let stockNuevo =
+productos[index].cantidad;
+
+if(!productos[index].historial){
+    productos[index].historial = [];
+}
+
+productos[index].historial.push({
+    fecha: fechaActual(),
+    tipo: "ENTRADA",
+    cantidad: cantidad,
+    stockAnterior: stockAnterior,
+    stockNuevo: stockNuevo
+});
+
+productos[index].modificado =
+fechaActual();
+
+guardarLocal();
+
+mostrarProductos();
+
+alert("Entrada registrada");
+
+}
+function salida(index){
+
+let cantidad =
+prompt("¿Cuántas unidades deseas retirar?");
+
+if(cantidad === null) return;
+
+cantidad = Number(cantidad);
+
+if(isNaN(cantidad) || cantidad <= 0){
+alert("Cantidad inválida");
+return;
+}
+
+
+if(!productos[index].historial){
+    productos[index].historial = [];
+}
+
+let stockAnterior =
+productos[index].cantidad;
+
+productos[index].cantidad -= cantidad;
+alert(
+"Cantidad actual: " +
+productos[index].cantidad
+);
+
+if(productos[index].cantidad < 0){
+    productos[index].cantidad = 0;
+}
+
+let stockNuevo =
+productos[index].cantidad;
+
+if(!productos[index].historial){
+    productos[index].historial = [];
+}
+
+productos[index].historial.push({
+    fecha: fechaActual(),
+    tipo: "SALIDA",
+    cantidad: cantidad,
+    stockAnterior: stockAnterior,
+    stockNuevo: stockNuevo
+});
+
+productos[index].modificado =
+fechaActual();
+
+guardarLocal();
+
+mostrarProductos();
+
+alert("Salida registrada");
+}
+
+function editar(index){
+
+const p = productos[index];
+
+document.getElementById("codigo").value = p.codigo;
+document.getElementById("nombre").value = p.nombre;
+document.getElementById("descripcion").value = p.descripcion;
+document.getElementById("cantidad").value = p.cantidad;
+document.getElementById("area").value = p.area;
+
+editando = index;
+
+window.scrollTo({
+top:0,
+behavior:"smooth"
+});
+}
+
+function eliminarProducto(index){
+
+if(
+confirm(
+"¿Eliminar producto?\n\n" +
+productos[index].nombre +
+"\n" +
+productos[index].codigo
+)
+)
+{
+
+productos.splice(index,1);
+
+guardarLocal();
+mostrarProductos();
+
+}
+}
+
+function limpiar(){
+
+document.getElementById("codigo").value = "";
+document.getElementById("nombre").value = "";
+document.getElementById("descripcion").value = "";
+document.getElementById("cantidad").value = "";
+document.getElementById("area").value = "";
+}
+
+document
+.getElementById("buscar")
+.addEventListener("input",mostrarProductos);
+
+mostrarProductos();
+
+function reiniciarInventario(){
+
+    if(confirm("¿Borrar todo el inventario?")){
+
+        productos = [];
+
+        localStorage.removeItem(
+            "inventario_trabajo"
+        );
+
+        mostrarProductos();
+    }
+};
+
+document
+.querySelectorAll("input, textarea")
+.forEach(campo => {
+
+    campo.addEventListener("input", () => {
+
+        campo.value = campo.value.toUpperCase();
+
+    });
+
+});
+
+function abrirFormulario(){
+
+document
+.getElementById("formularioProducto")
+.style.display = "block";
+
+}
+
+function cerrarFormulario(){
+
+document
+.getElementById("formularioProducto")
+.style.display = "none";
+
+};
+
+function verHistorial(index){
+
+    const p = productos[index];
+
+    if(!p.historial || p.historial.length === 0){
+
+        alert("Sin movimientos registrados");
+
+        return;
+    }
+
+    let texto =
+        "HISTORIAL DE " +
+        p.nombre +
+        "\n\n";
+
+    p.historial.forEach(h=>{
+
+    texto +=
+    h.fecha +
+    "\n" +
+    h.tipo +
+    "\nMOVIMIENTO: " + h.cantidad +
+    "\nANTES: " + h.stockAnterior +
+    "\nDESPUES: " + h.stockNuevo +
+    "\n\n";
+
+    });
+
+    alert(texto);
+
+};
+
+function actualizarEstadisticas(){
+
+    const totalProductos =
+    productos.length;
+
+    const totalExistencias =
+    productos.reduce(
+        (total,p) =>
+        total + Number(p.cantidad),
+        0
+    );
+
+    document
+    .getElementById("totalProductos")
+    .innerHTML =
+    "📦 Productos: " +
+    totalProductos;
+
+    document
+    .getElementById("totalExistencias")
+    .innerHTML =
+    "📊 Existencias: " +
+    totalExistencias;
+};
+
+function exportarExcel(){
+
+    const libro =
+    XLSX.utils.book_new();
+
+    // ==================
+    // HOJA INVENTARIO
+    // ==================
+
+    const inventario = productos.map(p=>({
+
+        CODIGO: p.codigo,
+
+        NOMBRE: p.nombre,
+
+        DESCRIPCION: p.descripcion,
+
+        CANTIDAD: p.cantidad,
+
+        AREA: p.area,
+
+        ULTIMA_MODIFICACION:
+        p.modificado
+
+    }));
+
+    const hojaInventario =
+    XLSX.utils.json_to_sheet(
+        inventario
+    );
+
+    XLSX.utils.book_append_sheet(
+        libro,
+        hojaInventario,
+        "INVENTARIO"
+    );
+
+
+
+    // ==================
+    // HOJA HISTORIAL
+    // ==================
+
+    const historialCompleto = [];
+
+    productos.forEach(p=>{
+
+        if(!p.historial) return;
+
+        p.historial.forEach(h=>{
+
+            historialCompleto.push({
+
+                FECHA: h.fecha,
+
+                CODIGO: p.codigo,
+
+                PRODUCTO: p.nombre,
+
+                TIPO: h.tipo,
+
+                MOVIMIENTO: h.cantidad,
+
+                ANTES:
+                h.stockAnterior ?? "",
+
+                DESPUES:
+                h.stockNuevo ?? ""
+
+            });
+
+        });
+
+    });
+
+    const hojaHistorial =
+    XLSX.utils.json_to_sheet(
+        historialCompleto
+    );
+
+    XLSX.utils.book_append_sheet(
+
+        libro,
+
+        hojaHistorial,
+
+        "HISTORIAL"
+
+    );
+
+
+
+    // ==================
+    // GUARDAR ARCHIVO
+    // ==================
+
+    const fecha =
+    new Date()
+    .toISOString()
+    .slice(0,10);
+
+    XLSX.writeFile(
+        libro,
+        `inventario_${fecha}.xlsx`
+    );
+
+
+
+    // ==================
+    // GUARDAR FECHA
+    // ==================
+
+    const ultima =
+    fechaActual();
+
+    localStorage.setItem(
+        "ultima_exportacion",
+        ultima
+    );
+
+    document
+    .getElementById(
+    "ultimaExportacion"
+    )
+    .innerHTML =
+    "🕒 Última exportación: " +
+    ultima;
+
+};
+
+</script>
+<button id="btnFlotante" onclick="abrirFormulario()">
++
+</button>
+</body>
+</html>
