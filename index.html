@@ -446,7 +446,7 @@ Cantidad: ${p.cantidad}
 </p>
 
 <div
-id="info-${index}"
+id="info-${p.codigo}"
 style="display:none;">
 
 <p><b>Descripción:</b> ${p.descripcion}</p>
@@ -459,27 +459,27 @@ style="display:none;">
 <div class="botones">
 
 <button class="entrada"
-onclick="entrada(${index})">
+onclick="entrada('${p.codigo}')">
 + Entrada
 </button>
 
 <button class="salida"
-onclick="salida(${index})">
+onclick="salida('${p.codigo}')">
 - Salida
 </button>
 
 <button class="editar"
-onclick="editar(${index})">
+onclick="editar('${p.codigo}')">
 Editar
 </button>
 
 <button class="borrar"
-onclick="eliminarProducto(${index})">
+onclick="eliminarProducto('${p.codigo}')">
 Eliminar
 </button>
 
 <button class="historial"
-onclick="verHistorial(${index})">
+onclick="verHistorial('${p.codigo}')">
 📜 Historial
 </button>
 
@@ -489,7 +489,7 @@ onclick="verHistorial(${index})">
 </div>
 
 <button
-onclick="toggleInfo(${index})"
+onclick="toggleInfo('${p.codigo}')"
 style="
 width:100%;
 margin-top:10px;
@@ -507,11 +507,11 @@ lista.appendChild(div);
 actualizarEstadisticas();
 }
 
-function toggleInfo(index){
+function toggleInfo(codigo){
 
     const info =
     document.getElementById(
-        "info-" + index
+        "info-" + codigo
     );
 
     if(info.style.display === "none"){
@@ -526,7 +526,13 @@ function toggleInfo(index){
 
 }
 
-function entrada(index){
+function entrada(codigo){
+
+const p = productos.find(
+    producto => producto.codigo === codigo
+);
+
+if(!p) return;
 
 let cantidad =
 prompt("¿Cuántas unidades deseas agregar?");
@@ -541,23 +547,18 @@ if(isNaN(cantidad) || cantidad <= 0){
 }
 
 let stockAnterior =
-productos[index].cantidad;
+p.cantidad;
 
-productos[index].cantidad += cantidad;
-
-alert(
-"Cantidad actual: " +
-productos[index].cantidad
-);
+p.cantidad += cantidad;
 
 let stockNuevo =
-productos[index].cantidad;
+p.cantidad;
 
-if(!productos[index].historial){
-    productos[index].historial = [];
+if(!p.historial){
+    p.historial = [];
 }
 
-productos[index].historial.push({
+p.historial.push({
     fecha: fechaActual(),
     tipo: "ENTRADA",
     cantidad: cantidad,
@@ -565,7 +566,7 @@ productos[index].historial.push({
     stockNuevo: stockNuevo
 });
 
-productos[index].modificado =
+p.modificado =
 fechaActual();
 
 guardarLocal();
@@ -574,8 +575,16 @@ mostrarProductos();
 
 alert("Entrada registrada");
 
-}
-function salida(index){
+};
+
+
+function salida(codigo){
+
+const p = productos.find(
+    producto => producto.codigo === codigo
+);
+
+if(!p) return;
 
 let cantidad =
 prompt("¿Cuántas unidades deseas retirar?");
@@ -585,36 +594,27 @@ if(cantidad === null) return;
 cantidad = Number(cantidad);
 
 if(isNaN(cantidad) || cantidad <= 0){
-alert("Cantidad inválida");
-return;
-}
-
-
-if(!productos[index].historial){
-    productos[index].historial = [];
+    alert("Cantidad inválida");
+    return;
 }
 
 let stockAnterior =
-productos[index].cantidad;
+p.cantidad;
 
-productos[index].cantidad -= cantidad;
-alert(
-"Cantidad actual: " +
-productos[index].cantidad
-);
+p.cantidad -= cantidad;
 
-if(productos[index].cantidad < 0){
-    productos[index].cantidad = 0;
+if(p.cantidad < 0){
+    p.cantidad = 0;
 }
 
 let stockNuevo =
-productos[index].cantidad;
+p.cantidad;
 
-if(!productos[index].historial){
-    productos[index].historial = [];
+if(!p.historial){
+    p.historial = [];
 }
 
-productos[index].historial.push({
+p.historial.push({
     fecha: fechaActual(),
     tipo: "SALIDA",
     cantidad: cantidad,
@@ -622,7 +622,7 @@ productos[index].historial.push({
     stockNuevo: stockNuevo
 });
 
-productos[index].modificado =
+p.modificado =
 fechaActual();
 
 guardarLocal();
@@ -630,11 +630,16 @@ guardarLocal();
 mostrarProductos();
 
 alert("Salida registrada");
-}
 
-function editar(index){
+};
 
-const p = productos[index];
+function editar(codigo){
+
+const p = productos.find(
+    producto => producto.codigo === codigo
+);
+
+if(!p) return;
 
 document.getElementById("codigo").value = p.codigo;
 document.getElementById("nombre").value = p.nombre;
@@ -642,15 +647,26 @@ document.getElementById("descripcion").value = p.descripcion;
 document.getElementById("cantidad").value = p.cantidad;
 document.getElementById("area").value = p.area;
 
-editando = index;
+editando = productos.findIndex(
+    producto =>
+    producto.codigo === codigo
+);
 
-window.scrollTo({
-top:0,
-behavior:"smooth"
-});
+document
+.getElementById("formularioProducto")
+.style.display = "block";
+
 }
 
-function eliminarProducto(index){
+function eliminarProducto(codigo){
+
+const index =
+productos.findIndex(
+    producto =>
+    producto.codigo === codigo
+);
+
+if(index === -1) return;
 
 if(
 confirm(
@@ -659,16 +675,17 @@ productos[index].nombre +
 "\n" +
 productos[index].codigo
 )
-)
-{
+){
 
 productos.splice(index,1);
 
 guardarLocal();
+
 mostrarProductos();
 
 }
-}
+
+};
 
 function limpiar(){
 
@@ -713,27 +730,31 @@ document
 
 function abrirFormulario(){
 
-document
-.getElementById("formularioProducto")
-.style.display = "block";
+    limpiar();
+
+    editando = null;
+
+    document
+    .getElementById("formularioProducto")
+    .style.display = "block";
 
 }
 
-function cerrarFormulario(){
+function verHistorial(codigo){
 
-document
-.getElementById("formularioProducto")
-.style.display = "none";
+    const p = productos.find(
+        producto =>
+        producto.codigo === codigo
+    );
 
-};
+    if(!p) return;
 
-function verHistorial(index){
+    if(!p.historial ||
+       p.historial.length === 0){
 
-    const p = productos[index];
-
-    if(!p.historial || p.historial.length === 0){
-
-        alert("Sin movimientos registrados");
+        alert(
+        "Sin movimientos registrados"
+        );
 
         return;
     }
@@ -745,14 +766,17 @@ function verHistorial(index){
 
     p.historial.forEach(h=>{
 
-    texto +=
-    h.fecha +
-    "\n" +
-    h.tipo +
-    "\nMOVIMIENTO: " + h.cantidad +
-    "\nANTES: " + h.stockAnterior +
-    "\nDESPUES: " + h.stockNuevo +
-    "\n\n";
+        texto +=
+        h.fecha +
+        "\n" +
+        h.tipo +
+        "\nMOVIMIENTO: " +
+        h.cantidad +
+        "\nANTES: " +
+        h.stockAnterior +
+        "\nDESPUES: " +
+        h.stockNuevo +
+        "\n\n";
 
     });
 
