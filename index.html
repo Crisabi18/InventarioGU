@@ -740,6 +740,18 @@ function abrirFormulario(){
 
 }
 
+function cerrarFormulario(){
+
+    document
+    .getElementById("formularioProducto")
+    .style.display = "none";
+
+    limpiar();
+
+    editando = null;
+
+};
+
 function verHistorial(codigo){
 
     const p = productos.find(
