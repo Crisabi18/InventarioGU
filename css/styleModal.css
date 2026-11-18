@@ -1,0 +1,75 @@
+.modal-alerta{
+
+    display:none;
+
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:100%;
+    height:100%;
+
+    backdrop-filter: blur(4px);
+
+    z-index:9999;
+
+    justify-content:center;
+    align-items:flex-start;
+    padding-top:60px;
+
+}
+
+.modal-alerta-contenido{
+
+    width:90%;
+    max-width:350px;
+
+    background:#1e1e1e;
+
+    color:white;
+
+    padding:20px;
+
+    border-radius:12px;
+
+    text-align:center;
+
+    border:
+    1px solid #333;
+
+}
+
+.modal-alerta-contenido button{
+
+    margin-top:15px;
+
+    background:#4CAF50;
+
+    border:none;
+
+    color:white;
+
+    padding:10px 20px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+}
+
+/* MODAL HISTORIAL */
+
+.modal-historial{
+
+    max-width:700px;
+
+    width:95%;
+
+    max-height:75vh;
+
+    overflow-y:auto;
+
+    text-align:left;
+
+}
