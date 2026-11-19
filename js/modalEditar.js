@@ -1,0 +1,145 @@
+let productoEditando =
+null;
+
+
+function editar(codigo){
+
+const p =
+productos.find(
+producto =>
+producto.codigo === codigo
+);
+
+if(!p) return;
+
+productoEditando = p;
+
+document.getElementById(
+"editCodigo"
+).value = p.codigo;
+
+document.getElementById(
+"editNombre"
+).value = p.nombre;
+
+document.getElementById(
+"editDescripcion"
+).value = p.descripcion;
+
+document.getElementById(
+"editCantidad"
+).value = p.cantidad;
+
+document.getElementById(
+"editArea"
+).value = p.area;
+
+document.getElementById(
+"modalEditar"
+).style.display =
+"flex";
+
+};
+
+function cerrarEditar(){
+
+document.getElementById(
+"modalEditar"
+).style.display =
+"none";
+
+};
+
+function guardarEdicionModal(){
+
+if(!productoEditando) return;
+
+productoEditando.codigo =
+document.getElementById(
+"editCodigo"
+).value
+.trim()
+.toUpperCase();
+
+productoEditando.nombre =
+document.getElementById(
+"editNombre"
+).value
+.trim()
+.toUpperCase();
+
+productoEditando.descripcion =
+document.getElementById(
+"editDescripcion"
+).value
+.trim()
+.toUpperCase();
+
+productoEditando.area =
+document.getElementById(
+"editArea"
+).value
+.trim()
+.toUpperCase();
+
+const cantidadNueva =
+Number(
+document.getElementById(
+"editCantidad"
+).value
+);
+
+const cantidadAnterior =
+productoEditando.cantidad;
+
+if(
+cantidadAnterior !== cantidadNueva
+){
+
+if(
+!productoEditando.historial
+){
+productoEditando.historial = [];
+}
+
+productoEditando.historial.push({
+
+fecha:
+fechaActual(),
+
+tipo:
+"AJUSTE",
+
+cantidad:
+cantidadNueva -
+cantidadAnterior,
+
+stockAnterior:
+cantidadAnterior,
+
+stockNuevo:
+cantidadNueva
+
+});
+
+}
+
+productoEditando.cantidad =
+cantidadNueva;
+
+productoEditando.modificado =
+fechaActual();
+
+guardarLocal();
+
+mostrarProductos();
+
+cerrarEditar();
+
+mostrarModal(
+"✅ Correcto",
+"Producto actualizado"
+);
+
+};
+

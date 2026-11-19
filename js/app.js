@@ -69,7 +69,10 @@ document.getElementById("area")
 .toUpperCase();
 
 if(nombre.trim() === ""){
-alert("Ingresa un nombre");
+mostrarModal(
+    "⚠️ Error",
+    "El nombre del producto es obligatorio"
+);
 return;
 }
 
@@ -454,30 +457,30 @@ mostrarModal(
 );};
 
 
-function editar(codigo){
+// function editar(codigo){
 
-const p = productos.find(
-    producto => producto.codigo === codigo
-);
+// const p = productos.find(
+//     producto => producto.codigo === codigo
+// );
 
-if(!p) return;
+// if(!p) return;
 
-document.getElementById("codigo").value = p.codigo;
-document.getElementById("nombre").value = p.nombre;
-document.getElementById("descripcion").value = p.descripcion;
-document.getElementById("cantidad").value = p.cantidad;
-document.getElementById("area").value = p.area;
+// document.getElementById("codigo").value = p.codigo;
+// document.getElementById("nombre").value = p.nombre;
+// document.getElementById("descripcion").value = p.descripcion;
+// document.getElementById("cantidad").value = p.cantidad;
+// document.getElementById("area").value = p.area;
 
-editando = productos.findIndex(
-    producto =>
-    producto.codigo === codigo
-);
+// editando = productos.findIndex(
+//     producto =>
+//     producto.codigo === codigo
+// );
 
-document
-.getElementById("formularioProducto")
-.style.display = "block";
+// document
+// .getElementById("formularioProducto")
+// .style.display = "block";
 
-}
+// }
 
 function eliminarProducto(codigo){
 
@@ -536,17 +539,30 @@ mostrarProductos();
 
 function reiniciarInventario(){
 
-    if(confirm("¿Borrar todo el inventario?")){
+mostrarConfirmacion(
 
-        productos = [];
+"⚠️ Reiniciar inventario",
 
-        localStorage.removeItem(
-            "inventario_trabajo"
-        );
+"Esta acción eliminará todos los productos",
 
-        mostrarProductos();
-    }
-};
+function(){
+
+    productos = [];
+
+    guardarLocal();
+
+    mostrarProductos();
+
+    mostrarModal(
+        "✅ Correcto",
+        "Inventario reiniciado"
+    );
+
+}
+
+);
+
+}
 
 document
 .querySelectorAll("input, textarea")
