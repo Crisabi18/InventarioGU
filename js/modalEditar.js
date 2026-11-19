@@ -1,6 +1,49 @@
 let productoEditando =
 null;
 
+function nuevoProducto(){
+
+    productoEditando = null;
+
+    document.getElementById(
+    "editCodigo"
+    ).value = "";
+
+    document.getElementById(
+    "editNombre"
+    ).value = "";
+
+    document.getElementById(
+    "editDescripcion"
+    ).value = "";
+
+    document.getElementById(
+    "editCantidad"
+    ).value = "";
+
+    document.getElementById(
+    "editArea"
+    ).value = "";
+
+    document.getElementById("codigo").value = "";
+    document.getElementById("nombre").value = "";
+    document.getElementById("descripcion").value = "";
+    document.getElementById("cantidad").value = "";
+    document.getElementById("area").value = "";
+
+
+    document.getElementById(
+    "tituloEditar"
+    ).innerText =
+    "📦 Nuevo producto";
+
+    document.getElementById(
+    "modalEditar"
+    ).style.display =
+    "flex";
+
+};
+
 
 function editar(codigo){
 
@@ -35,6 +78,11 @@ document.getElementById(
 ).value = p.area;
 
 document.getElementById(
+"tituloEditar"
+).innerText =
+"✏️ Editar producto";
+
+document.getElementById(
 "modalEditar"
 ).style.display =
 "flex";
@@ -50,7 +98,41 @@ document.getElementById(
 
 };
 
+
+
 function guardarEdicionModal(){
+
+if(productoEditando === null){
+
+    document.getElementById("codigo").value =
+    document.getElementById("editCodigo").value;
+
+    document.getElementById("nombre").value =
+    document.getElementById("editNombre").value;
+
+    document.getElementById("descripcion").value =
+    document.getElementById("editDescripcion").value;
+
+    document.getElementById("cantidad").value =
+    document.getElementById("editCantidad").value;
+
+    document.getElementById("area").value =
+    document.getElementById("editArea").value;
+
+    guardarProducto();
+
+    cerrarEditar();
+
+    mostrarModal(
+    "✅ Correcto",
+    "Producto Guardado"
+    );
+
+    return;
+
+}
+
+
 
 if(!productoEditando) return;
 

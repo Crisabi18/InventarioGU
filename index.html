@@ -80,16 +80,7 @@ onchange="importarExcel(event)">
     💾 Guardar Producto
     </button>
 
-    <button
-    style="
-    width:100%;
-    margin-top:10px;
-    background:#d32f2f;
-    color:white;
-    "
-    onclick="reiniciarInventario()">
-    🗑 Reiniciar Inventario
-    </button>
+    
 
     <button class="cancelar" onclick="cerrarFormulario()">
       🔙 Cancelar
@@ -101,8 +92,8 @@ onchange="importarExcel(event)">
 <div id="lista"></div>
 
 
-<button id="btnFlotante" onclick="abrirFormulario()">
-+
+<button id="btnFlotante" onclick="nuevoProducto()">
++  
 </button>
 
 <!-- MODAL -->
@@ -234,8 +225,8 @@ onchange="importarExcel(event)">
 
     <div class="modal-alerta-contenido">
 
-        <h2>
-            ✏️ Editar producto
+        <h2 id="tituloEditar">
+         ✏️ Editar producto
         </h2>
 
         <input
@@ -276,6 +267,18 @@ onchange="importarExcel(event)">
             </button>
 
         </div>
+
+        <h3 style="margin-top:20px;">- OTRAS OPCIONES -</h3>
+        <button
+        style="
+        width:100%;
+        margin-top:10px;
+        background:#d32f2f;
+        color:white;
+        "
+        onclick="reiniciarInventario(cerrarEditar())">
+        🗑 Reiniciar Inventario
+        </button>
 
     </div>
 

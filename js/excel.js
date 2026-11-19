@@ -1,5 +1,16 @@
 function exportarExcel(){
 
+    if(productos.length === 0){
+
+    mostrarModal(
+        "⚠️ Sin datos",
+        "No hay productos para exportar"
+    );
+
+    return;
+
+    }
+
     const libro =
     XLSX.utils.book_new();
 
@@ -8,6 +19,12 @@ function exportarExcel(){
     "Nombre del archivo:",
     "Almacen_Central"
     );
+
+    if(
+    nombreArchivo === null
+    ){
+        return;
+    }
 
     // ==================
     // HOJA INVENTARIO
@@ -260,8 +277,9 @@ function importarExcel(event){
 
         mostrarProductos();
 
-        alert(
-        "Inventario importado correctamente"
+        mostrarModal(
+            "✅ Éxito",
+            "Inventario importado correctamente"
         );
 
     };

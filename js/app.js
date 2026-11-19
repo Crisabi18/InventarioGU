@@ -570,7 +570,15 @@ document
 
     campo.addEventListener("input", () => {
 
-        campo.value = campo.value.toUpperCase();
+        if(
+            campo.type === "file" ||
+            campo.type === "number"
+        ){
+            return;
+        }
+
+        campo.value =
+        campo.value.toUpperCase();
 
     });
 
