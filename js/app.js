@@ -76,61 +76,65 @@ mostrarModal(
 return;
 }
 
-if(editando === null){
+    if(editando === null){
 
-    const existente = productos.find(
-        p => p.codigo === codigo
+        const existente = productos.find(
+            p => p.codigo === codigo
+        );
+
+
+        if(existente){
+
+            mostrarCantidad(
+
+        "⚠️ PRODUCTO EXISTENTE",
+
+        "Existencias actuales: " +
+        existente.cantidad,
+
+        function(extra){
+
+            existente.cantidad += extra;
+
+            if(extra === null) return;
+
+            extra = Number(extra);
+
+            if(isNaN(extra) || extra <= 0){
+                mostrarModal(
+                "⚠️ Error",
+                "Cantidad inválida"
+                );
+                return;
+            }
+
+            existente.cantidad += extra;
+
+            existente.modificado = fechaActual();
+
+            if(!existente.historial){
+                existente.historial = [];
+            }
+
+            existente.historial.push({
+                fecha: fechaActual(),
+                tipo: "ENTRADA",
+                cantidad: extra
+            });
+
+            guardarLocal();
+            mostrarProductos();
+            limpiar();
+
+            return;
+
+        }
+
     );
 
-    if(existente){
-
-        mostrarCantidad(
-
-    "⚠️ PRODUCTO EXISTENTE",
-
-    "Existencias actuales: " +
-    existente.cantidad,
-
-    function(extra){
-
-        existente.cantidad += extra;
-
-        if(extra === null) return;
-
-        extra = Number(extra);
-
-        if(isNaN(extra) || extra <= 0){
-            alert("Cantidad inválida");
-            return;
+            
         }
-
-        existente.cantidad += extra;
-
-        existente.modificado = fechaActual();
-
-        if(!existente.historial){
-            existente.historial = [];
-        }
-
-        existente.historial.push({
-            fecha: fechaActual(),
-            tipo: "ENTRADA",
-            cantidad: extra
-        });
-
-        guardarLocal();
-        mostrarProductos();
-        limpiar();
-
-        return;
-
-    }
-
-);
-
-        
-    }
-};
+    };
 
 if(editando !== null){
 
@@ -382,7 +386,7 @@ guardarLocal();
 
 mostrarProductos();
 
-mostrarModal(
+mostrarToast(
 "✅ Correcto",
 "Entrada registrada"
 );
@@ -447,7 +451,7 @@ guardarLocal();
 
 mostrarProductos();
 
-mostrarModal(
+mostrarToast(
     "✅ Correcto",
     "Salida registrada"
 );
@@ -553,7 +557,7 @@ function(){
 
     mostrarProductos();
 
-    mostrarModal(
+    mostrarToast(
         "✅ Correcto",
         "Inventario reiniciado"
     );

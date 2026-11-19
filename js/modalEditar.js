@@ -123,7 +123,7 @@ if(productoEditando === null){
 
     cerrarEditar();
 
-    mostrarModal(
+    mostrarToast(
     "✅ Correcto",
     "Producto Guardado"
     );
@@ -218,7 +218,7 @@ mostrarProductos();
 
 cerrarEditar();
 
-mostrarModal(
+mostrarToast(
 "✅ Correcto",
 "Producto actualizado"
 );

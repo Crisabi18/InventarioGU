@@ -18,6 +18,8 @@
     align-items:flex-start;
     padding-top:60px;
 
+    transition: opacity .4s ease;
+
 }
 
 .modal-alerta-contenido{

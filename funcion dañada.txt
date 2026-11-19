@@ -1,0 +1,190 @@
+function guardarProducto(){
+
+//CAMBIAR ESTO:
+// const codigo = document.getElementById("codigo").value;
+// const nombre = document.getElementById("nombre").value;
+// const descripcion = document.getElementById("descripcion").value;
+const cantidad = Number(document.getElementById("cantidad").value) || 0;
+// const area = document.getElementById("area").value;
+
+//POR ESTO:
+const codigo =
+document.getElementById("codigo")
+.value
+.trim()
+.toUpperCase();
+
+const nombre =
+document.getElementById("nombre")
+.value
+.trim()
+.toUpperCase();
+
+const descripcion =
+document.getElementById("descripcion")
+.value
+.trim()
+.toUpperCase();
+
+const area =
+document.getElementById("area")
+.value
+.trim()
+.toUpperCase();
+
+if(nombre.trim() === ""){
+mostrarModal(
+    "⚠️ Error",
+    "El nombre del producto es obligatorio"
+);
+return;
+}
+
+    if(editando === null){
+
+        const existente = productos.find(
+            p => p.codigo === codigo
+        );
+
+        if(
+        existente &&
+        existente.nombre !== nombre
+        ){
+
+        mostrarModal(
+            "⚠️ Código duplicado",
+            "El código ya existe con otro nombre:\n\n" +
+            existente.nombre
+        );
+
+        return;
+
+        }
+
+        if(existente){
+
+            mostrarCantidad(
+
+        "⚠️ PRODUCTO EXISTENTE",
+
+        "Existencias actuales: " +
+        existente.cantidad,
+
+        function(extra){
+
+            existente.cantidad += extra;
+
+            if(extra === null) return;
+
+            extra = Number(extra);
+
+            if(isNaN(extra) || extra <= 0){
+                mostrarModal(
+                "⚠️ Error",
+                "Cantidad inválida"
+                );
+                return;
+            }
+
+            existente.cantidad += extra;
+
+            existente.modificado = fechaActual();
+
+            if(!existente.historial){
+                existente.historial = [];
+            }
+
+            existente.historial.push({
+                fecha: fechaActual(),
+                tipo: "ENTRADA",
+                cantidad: extra
+            });
+
+            guardarLocal();
+            mostrarProductos();
+            limpiar();
+
+            return;
+
+        }
+
+    );
+
+            
+        }
+    };
+
+if(editando !== null){
+
+let cantidadAnterior =
+Number(
+    productos[editando].cantidad
+);
+
+if(!productos[editando].historial){
+    productos[editando].historial = [];
+}
+
+if(
+cantidadAnterior !== cantidad
+){
+
+productos[editando].historial.push({
+
+    fecha: fechaActual(),
+
+    tipo: "AJUSTE",
+
+    cantidad:
+    cantidad - cantidadAnterior,
+
+    stockAnterior:
+    cantidadAnterior,
+
+    stockNuevo:
+    cantidad
+
+});
+
+}
+
+productos[editando] = {
+    ...productos[editando],
+    codigo,
+    nombre,
+    descripcion,
+    cantidad,
+    area,
+    modificado: fechaActual()
+};
+
+editando = null;
+
+}else{
+
+productos.push({
+codigo,
+nombre,
+descripcion,
+cantidad,
+area,
+modificado: fechaActual(),
+
+historial:[
+{
+    fecha:fechaActual(),
+    tipo:"CREACION",
+    cantidad:cantidad,
+    stockAnterior:0,
+    stockNuevo:cantidad
+}
+]
+
+});
+
+}
+
+guardarLocal();
+limpiar();
+mostrarProductos();
+}

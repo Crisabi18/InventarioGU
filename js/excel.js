@@ -1,3 +1,5 @@
+let libroPendiente = null;
+
 function exportarExcel(){
 
     if(productos.length === 0){
@@ -14,18 +16,7 @@ function exportarExcel(){
     const libro =
     XLSX.utils.book_new();
 
-    const nombreArchivo =
-    prompt(
-    "Nombre del archivo:",
-    "Almacen_Central"
-    );
-
-    if(
-    nombreArchivo === null
-    ){
-        return;
-    }
-
+   
     // ==================
     // HOJA INVENTARIO
     // ==================
@@ -112,10 +103,11 @@ function exportarExcel(){
     );
 
 
-    XLSX.writeFile(
-    libro,
-    nombreArchivo + ".xlsx"
-    );
+    libroPendiente = libro;
+
+    mostrarExportacion();
+
+    return;
 
 
     // ==================

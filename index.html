@@ -108,10 +108,10 @@ onchange="importarExcel(event)">
 
         <p id="textoModal"></p>
 
-        <button
+        <!-- <button
         onclick="cerrarModal()">
             Aceptar
-        </button>
+        </button> -->
 
     </div>
 
@@ -284,6 +284,47 @@ onchange="importarExcel(event)">
 
 </div>
 <!-- fin modalEditar  -->
+
+<!-- modal exportar -->
+ <div id="modalExportar" class="modal-alerta">
+
+    <div class="modal-alerta-contenido">
+
+        <h2>
+            📥 Exportar Excel
+        </h2>
+
+        <p>
+            Nombre del archivo:
+        </p>
+
+        <input
+        type="text"
+        id="nombreExportacion"
+        value="Inventario">
+
+        <div style="
+        display:flex;
+        gap:10px;
+        justify-content:center;
+        margin-top:15px;">
+
+            <button
+            onclick="cerrarExportacion()">
+                Cancelar
+            </button>
+
+            <button
+            onclick="confirmarExportacion()">
+                Exportar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+<!-- fin modal exportar -->
  
 <!-- JS -->
 <script src="js/excel.js"></script>

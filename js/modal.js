@@ -1,3 +1,29 @@
+function mostrarToast(
+titulo,
+texto
+){
+
+document.getElementById(
+"tituloModal"
+).innerText = titulo;
+
+document.getElementById(
+"textoModal"
+).innerText = texto;
+
+document.getElementById(
+"modalAlerta"
+).style.display =
+"flex";
+
+setTimeout(() => {
+
+    cerrarModal();
+
+}, 2000);
+
+}
+
 function mostrarModal(
 titulo,
 texto
@@ -28,12 +54,22 @@ document
 
 function cerrarModal(){
 
-document
-.getElementById(
+document.getElementById(
 "modalAlerta"
-)
-.style.display =
+).style.opacity = "0";
+
+setTimeout(()=>{
+
+document.getElementById(
+"modalAlerta"
+).style.display =
 "none";
+
+document.getElementById(
+"modalAlerta"
+).style.opacity = "1";
+
+},400);
 
 };
 
@@ -204,5 +240,60 @@ document
 )
 .style.display =
 "none";
+
+};
+
+//modal exportar
+
+
+function mostrarExportacion(){
+
+document.getElementById(
+"nombreExportacion"
+).value =
+"Inventario";
+
+document.getElementById(
+"modalExportar"
+).style.display =
+"flex";
+
+};
+
+function cerrarExportacion(){
+
+document.getElementById(
+"modalExportar"
+).style.display =
+"none";
+
+};
+
+function confirmarExportacion(){
+
+    const nombre =
+    document.getElementById(
+        "nombreExportacion"
+    )
+    .value
+    .trim();
+
+    if(nombre === ""){
+
+        mostrarModal(
+            "⚠️ Error",
+            "Ingresa un nombre"
+        );
+
+        return;
+
+    }
+
+    XLSX.writeFile(
+        libroPendiente,
+        nombre + ".xlsx"
+    );
+
+    cerrarExportacion();
 
 };
