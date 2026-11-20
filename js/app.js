@@ -69,7 +69,7 @@ document.getElementById("area")
 .toUpperCase();
 
 if(nombre.trim() === ""){
-mostrarModal(
+mostrarToast(
     "⚠️ Error",
     "El nombre del producto es obligatorio"
 );
@@ -85,7 +85,7 @@ return;
 
         if(existente){
 
-            mostrarCantidad(
+    mostrarCantidad(
 
         "⚠️ PRODUCTO EXISTENTE",
 
@@ -94,23 +94,24 @@ return;
 
         function(extra){
 
-            existente.cantidad += extra;
-
             if(extra === null) return;
 
             extra = Number(extra);
 
             if(isNaN(extra) || extra <= 0){
+
                 mostrarModal(
-                "⚠️ Error",
-                "Cantidad inválida"
+                    "⚠️ Error",
+                    "Cantidad inválida"
                 );
+
                 return;
             }
 
             existente.cantidad += extra;
 
-            existente.modificado = fechaActual();
+            existente.modificado =
+            fechaActual();
 
             if(!existente.historial){
                 existente.historial = [];
@@ -126,14 +127,13 @@ return;
             mostrarProductos();
             limpiar();
 
-            return;
-
         }
 
     );
 
-            
-        }
+    return; // 👈 ESTA LÍNEA
+
+    }
     };
 
 if(editando !== null){
@@ -352,7 +352,7 @@ if(cantidad === null) return;
 cantidad = Number(cantidad);
 
 if(isNaN(cantidad) || cantidad <= 0){
-    mostrarModal(
+    mostrarToast(
     "⚠️ Error",
     "Cantidad inválida"
 );
@@ -413,7 +413,8 @@ mostrarCantidad(
 function(cantidad){
 
 if(isNaN(cantidad) || cantidad <= 0){
-    mostrarModal(
+
+    mostrarToast(
     "⚠️ Error",
     "Cantidad inválida"
 );
@@ -515,7 +516,7 @@ function(){
 
     mostrarProductos();
 
-    mostrarModal(
+    mostrarToast(
         "✅ Correcto",
         "Producto eliminado"
     );
@@ -624,7 +625,7 @@ function verHistorial(codigo){
     if(!p.historial ||
        p.historial.length === 0){
 
-        mostrarModal(
+        mostrarToast(
             "❌ Error",
             "Sin movimientos registrados"
         );

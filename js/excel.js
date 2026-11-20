@@ -4,7 +4,7 @@ function exportarExcel(){
 
     if(productos.length === 0){
 
-    mostrarModal(
+    mostrarToast(
         "⚠️ Sin datos",
         "No hay productos para exportar"
     );
@@ -146,6 +146,7 @@ function exportarExcel(){
     "🕒 Última exportación: " +
     ultima;
 
+
 };
 
 function importarExcel(event){
@@ -269,7 +270,7 @@ function importarExcel(event){
 
         mostrarProductos();
 
-        mostrarModal(
+        mostrarToast(
             "✅ Éxito",
             "Inventario importado correctamente"
         );

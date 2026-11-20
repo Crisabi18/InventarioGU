@@ -207,8 +207,8 @@ document
     isNaN(cantidad)
     || cantidad <= 0
     ){
-
-        mostrarModal(
+        cerrarCantidad();
+        mostrarToast(
         "⚠️ Error",
         "Cantidad inválida"
         );
@@ -279,8 +279,8 @@ function confirmarExportacion(){
     .trim();
 
     if(nombre === ""){
-
-        mostrarModal(
+        cerrarExportacion();
+        mostrarToast(
             "⚠️ Error",
             "Ingresa un nombre"
         );
@@ -288,6 +288,7 @@ function confirmarExportacion(){
         return;
 
     }
+    
 
     XLSX.writeFile(
         libroPendiente,
@@ -295,5 +296,9 @@ function confirmarExportacion(){
     );
 
     cerrarExportacion();
+    mostrarToast(
+        "✅ Correcto",
+        "Archivo exportado"
+    );
 
 };
