@@ -134,3 +134,24 @@ display:none;
     font-size:18px;
     font-weight:bold;
 }
+
+/* calculadora */
+.calc-grid{
+
+display:grid;
+
+grid-template-columns:
+repeat(4,1fr);
+
+gap:8px;
+
+}
+
+.calc-grid button{
+
+padding:15px;
+
+font-size:18px;
+
+}
+

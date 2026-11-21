@@ -11,7 +11,34 @@
 </head>
 <body>
 
-<h1>📦 Inventario</h1>
+
+<div style="
+display:flex;
+justify-content:center;
+align-items:center;
+gap:10px;">
+
+<h1>
+📦 Inventario
+</h1>
+
+<button
+onclick="toggleCalculadora()"
+style="
+margin-bottom:10px;
+margin-left:30px;
+background:none;
+border:none;
+font-size:24px;
+cursor:pointer;
+color:white;
+align-items:flex-end;">
+
+<img src="img/calculadora.png" alt="Calculadora" style="width:30px; height:30px;">
+
+</button>
+
+</div>
 
 <div id="estadisticas">
     <div id="totalProductos"></div>
@@ -325,11 +352,84 @@ onchange="importarExcel(event)">
 
 </div>
 <!-- fin modal exportar -->
+
+<!-- modal calculadora -->
+
+<div id="modalCalculadora"
+class="modal-alerta">
+
+<div class="modal-alerta-contenido">
+
+<h2 style="align-items:center; justify-content: center; display:flex; gap:10px;">
+
+<img src="img/calculadora.png" alt="Calculadora" style="width:30px; height:30px;"> Calculadora
+
+</h2>
+
+<input
+id="pantallaCalc"
+readonly
+style="
+width:100%;
+padding:10px;
+font-size:1.2rem;
+text-align:right;
+margin-top:20px;
+margin-bottom:15px;">
+
+<div class="calc-grid">
+
+<button onclick="agregarCalc('7')">7</button>
+<button onclick="agregarCalc('8')">8</button>
+<button onclick="agregarCalc('9')">9</button>
+<button onclick="agregarCalc('/')">÷</button>
+
+<button onclick="agregarCalc('4')">4</button>
+<button onclick="agregarCalc('5')">5</button>
+<button onclick="agregarCalc('6')">6</button>
+<button onclick="agregarCalc('*')">×</button>
+
+<button onclick="agregarCalc('1')">1</button>
+<button onclick="agregarCalc('2')">2</button>
+<button onclick="agregarCalc('3')">3</button>
+<button onclick="agregarCalc('-')">−</button>
+
+<button onclick="agregarCalc('0')">0</button>
+<button onclick="agregarCalc('.')">.</button>
+<button onclick="resolverCalc()">=</button>
+<button onclick="agregarCalc('+')">+</button>
+
+</div>
+
+<div style="
+margin-top:10px;
+display:flex;
+margin-left:35px;
+gap:10px;">
+
+<button style="width: 100px; height: 50px;"
+onclick="limpiarCalc()">
+C
+</button>
+
+<button style="width: 100px; height: 50px; align-items:end; justify-content:end;"
+onclick="cerrarCalc()">
+Cerrar
+</button>
+
+</div>
+
+</div>
+
+</div>
+<!-- modal calculadora -->
  
 <!-- JS -->
 <script src="js/excel.js"></script>
 <script src="js/modal.js"></script>
 <script src="js/modalEditar.js"></script>
+<script src="js/calculadora.js"></script>
 <script src="js/app.js"></script>
+
 </body>
 </html>
